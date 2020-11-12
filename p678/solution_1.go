@@ -1,6 +1,4 @@
-package p_678_valid_parenthesis_string
-
-import "math"
+package p678
 
 //There is another simple O(n) solution with O(1) space complexity, not very intuitive like the greedy approach, but it's nice to know about it.
 //We can rephrase the problem by listing all the valid cases. There are 3 valid cases:
@@ -21,48 +19,47 @@ import "math"
 // invalid:
 // )()(
 // ())
+// (())((())()()(*)(*()(())())())()()((()())((()))(*
 
-const openParanth = '('
-const closeParanth = ')'
-const star = '*'
+func CheckValidString(s string) bool {
+	const leftParanth = '('
+	const rightParanth = ')'
+	const star = '*'
 
-func checkValidString(s string) bool {
-	if s == "" {
-		return true
-	}
-	r := []rune(s)
-	if r[0] == ')' {
-		return false
-	}
-
-	openParanthCount := 0
-	closeParanthCount := 0
-	starCount := 0
-
-	for _, r := range r {
-		if r == openParanth {
-			openParanthCount++
+	leftBalance := 0
+	for _, rl := range s {
+		if rl == leftParanth || rl == star {
+			leftBalance++
+		} else {
+			leftBalance--
 		}
-		if r == closeParanth {
-			closeParanthCount++
-		}
-		if r == star {
-			starCount++
+		// balance has to be positive
+		// since we moving left to right and our first paran is left one
+		// we either keep going with the same paran, e.g. (( or close on the valid sequence e.g. () for the string/sequence
+		// to be valid
+		// if the sequence is being closed (()) (once the balance of 0 met), the new sequence has to begin (of course
+		// with the same left paran)
+		// or it is the end of the sting
+
+		if leftBalance < 0 {
+			return false
 		}
 	}
 
-	// balanced
-	if openParanthCount == closeParanthCount {
+	if leftBalance == 0 {
 		return true
 	}
 
-
-	absParanthDiff := math.Abs(float64(openParanthCount - closeParanthCount))
-
-	if int(absParanthDiff) < starCount {
-		return true
+	rightBalance := 0
+	for i:=len(s)-1; i >= 0; i--  {
+		if s[i] == rightParanth ||  s[i] == star {
+			rightBalance++
+		} else {
+			rightBalance--
+		}
+		if rightBalance < 0 {
+			return false
+		}
 	}
-
-	return false
-
+	return true
 }
